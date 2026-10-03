@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Результаты марафона</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="app" class="page-shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">SberPrime Moscow Marathon · 27 сентября 2026</p>
+          <h1>Результаты бегунов</h1>
+          <p class="subtitle">Первые {{ pageSize }} записей из общего списка участников</p>
+        </div>
+        <div class="header-mark">42,2<span>км</span></div>
+      </header>
+
+      <section v-if="!loading && !error" class="dashboard" aria-label="Дашборд результатов">
+        <div class="dashboard-top">
+          <article class="chart-panel age-panel">
+            <div class="panel-heading">
+              <h2>По возрасту и полу</h2>
+              <span>человек</span>
+            </div>
+            <div id="age-chart" class="chart chart--age"></div>
+          </article>
+
+          <article class="chart-panel participants-panel">
+            <div class="panel-heading">
+              <h2>Участники</h2>
+              <span>всего</span>
+            </div>
+            <div id="participants-summary" class="participants-summary"></div>
+          </article>
+
+          <article class="chart-panel countries-panel">
+            <div class="panel-heading">
+              <h2>По странам</h2>
+              <span>топ-8</span>
+            </div>
+            <div id="countries-chart" class="chart chart--countries"></div>
+          </article>
+
+          <article class="chart-panel athletes-panel">
+            <div class="panel-heading"><h2>Топ спортсменов</h2><span>топ-3 по полу</span></div>
+            <div id="athletes-chart" class="chart chart--athletes"></div>
+          </article>
+        </div>
+
+        <article class="chart-panel finish-panel">
+          <div class="panel-heading">
+            <h2>Распределение на финише</h2>
+            <span>одна черта — один спортсмен</span>
+          </div>
+          <div id="finish-chart" class="chart chart--finish"></div>
+        </article>
+      </section>
+
+      <section class="summary-grid" aria-label="Сводка">
+        <article class="summary-card">
+          <span class="summary-label">Всего участников</span>
+          <strong>{{ formatNumber(totalRunners) }}</strong>
+        </article>
+        <article class="summary-card">
+          <span class="summary-label">На странице</span>
+          <strong>{{ visibleRunners.length }}</strong>
+        </article>
+        <article class="summary-card">
+          <span class="summary-label">Категории</span>
+          <strong>{{ categoryCount }}</strong>
+        </article>
+      </section>
+
+      <section class="table-card">
+        <div v-if="loading" class="state-message">Загрузка данных…</div>
+        <div v-else-if="error" class="state-message state-message--error">{{ error }}</div>
+        <template v-else>
+          <div class="table-toolbar">
+            <h2>Таблица результатов</h2>
+            <span class="table-range">Записи 1—{{ visibleRunners.length }}</span>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Место</th>
+                  <th>Имя</th>
+                  <th>Страна, возраст</th>
+                  <th>Биб</th>
+                  <th>Темп, мин/км</th>
+                  <th>Финиш</th>
+                  <th>Класс</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="runner in visibleRunners" :key="runner.class + '-' + runner.bib_number + '-' + runner.result_url">
+                  <td class="place-cell">{{ runner.place }}</td>
+                  <td class="name-cell">{{ runner.name }}</td>
+                  <td>{{ runner.country_and_age }}</td>
+                  <td class="numeric-cell">{{ runner.bib_number }}</td>
+                  <td class="numeric-cell">{{ runner.pace }}</td>
+                  <td class="finish-cell">{{ runner.finish_time }}</td>
+                  <td><span class="class-badge" :class="'class-badge--' + runner.class">{{ runner.class }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
